@@ -6,7 +6,7 @@ const doc = {
         title: 'Ramon Andrade Contacts API',
         description: 'API for managing contacts'
     },
-    host: 'localhost:'+PORT,
+    host: process.env.NODE_ENV==='production'?'cse341project1-0a6p.onrender.com': 'localhost:'+PORT,
     schemes: ['http','https']
 };
 
