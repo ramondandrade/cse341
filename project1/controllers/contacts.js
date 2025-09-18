@@ -1,5 +1,6 @@
 const db = require('../models');
 const Contacts = db.contacts;
+const ObjectId = require('mongodb').ObjectId;
 
 exports.getAll = (req, res) => {
   console.log('Retrieving all contacts');
@@ -16,8 +17,11 @@ exports.getAll = (req, res) => {
 
 // Find a single Contacts with an id
 exports.getOne = (req, res) => {
-  const contact_id = req.params.contact_id;
-  
+  if (!ObjectId.isValid(req.params.contact_id)) {
+    res.status(400).json('Must use a valid contact id to find a contact.');
+  }
+  const contact_id =  new ObjectId(req.params.contact_id );
+
   Contacts.find({ _id: contact_id })
     .then((data) => {
       if (!data)
@@ -37,32 +41,6 @@ exports.getOne = (req, res) => {
 exports.create = (req, res) => {
 
   console.log("Creating contact:", req.body);
-
-  // Validate request
-  if (!req.body.firstName) {
-    res.status(400).send({ message: 'First name can not be empty!' });
-    return;
-  }
-
-  if (!req.body.lastName) {
-    res.status(400).send({ message: 'Last name can not be empty!' });
-    return;
-  }
-
-  if (!req.body.email) {
-    res.status(400).send({ message: 'Email can not be empty!' });
-    return;
-  }
-
-  if (!req.body.favoriteColor) {
-    res.status(400).send({ message: 'Favorite Color can not be empty!' });
-    return;
-  }
-
-  if (!req.body.birthday) {
-    res.status(400).send({ message: 'Birthday can not be empty!' });
-    return;
-  }
 
   // Create a Contacts
   const contacts = new Contacts({
@@ -95,7 +73,11 @@ exports.update = (req, res) => {
     });
   }
 
-  const contact_id = req.params.contact_id;
+  if (!ObjectId.isValid(req.params.contact_id)) {
+    res.status(400).json('Must use a valid contact id to find a contact.');
+  }
+
+  const contact_id =  new ObjectId(req.params.contact_id );
 
   const contacts = {
     firstName: req.body.firstName,
@@ -130,7 +112,11 @@ exports.update = (req, res) => {
 
 // Delete a Contacts with the specified id in the request
 exports.delete = (req, res) => {
-  const contact_id = req.params.contact_id;
+
+  if (!ObjectId.isValid(req.params.contact_id)) {
+    res.status(400).json('Must use a valid contact id to find a contact.');
+  }
+  const contact_id =  new ObjectId(req.params.contact_id );
 
   Contacts.findByIdAndRemove(contact_id, { useFindAndModify: false })
     .then((data) => {
